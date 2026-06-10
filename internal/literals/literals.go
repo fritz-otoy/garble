@@ -38,8 +38,27 @@ const (
 // NameProviderFunc defines a function type that generates a string based on a random source and a base name.
 type NameProviderFunc func(rand *mathrand.Rand, baseName string) string
 
+type KeepStringFunc func(value string) bool
+
+type obfuscateOptions struct {
+	keepString KeepStringFunc
+}
+
+type ObfuscateOption func(*obfuscateOptions)
+
+func WithKeepString(fn KeepStringFunc) ObfuscateOption {
+	return func(opts *obfuscateOptions) {
+		opts.keepString = fn
+	}
+}
+
 // Obfuscate replaces literals with obfuscated anonymous functions.
-func Obfuscate(rand *mathrand.Rand, file *ast.File, info *types.Info, linkStrings map[*types.Var]string, nameFunc NameProviderFunc) *ast.File {
+func Obfuscate(rand *mathrand.Rand, file *ast.File, info *types.Info, linkStrings map[*types.Var]string, nameFunc NameProviderFunc, opts []ObfuscateOption) *ast.File {
+	var options obfuscateOptions
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	or := newObfRand(rand, file, nameFunc)
 	pre := func(cursor *astutil.Cursor) bool {
 		switch node := cursor.Node().(type) {
@@ -85,6 +104,9 @@ func Obfuscate(rand *mathrand.Rand, file *ast.File, info *types.Info, linkString
 
 		if typeAndValue.Type == types.Typ[types.String] && typeAndValue.Value != nil {
 			value := constant.StringVal(typeAndValue.Value)
+			if options.keepString != nil && options.keepString(value) {
+				return true
+			}
 			if len(value) < MinSize || len(value) > MaxSize {
 				return true
 			}

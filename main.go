@@ -103,11 +103,12 @@ var booleanFlags = map[string]bool{
 }
 
 var flagSet = flag.NewFlagSet("garble", flag.ExitOnError)
-var rxGarbleFlag = regexp.MustCompile(`-(?:literals|tiny|debug|debugdir|seed)(?:$|=)`)
+var rxGarbleFlag = regexp.MustCompile(`-(?:literals|tiny|oreans|debug|debugdir|seed)(?:$|=)`)
 
 var (
 	flagLiterals bool
 	flagTiny     bool
+	flagOreans   bool
 	flagDebug    bool
 	flagDebugDir string
 	flagSeed     seedFlag
@@ -124,6 +125,7 @@ func init() {
 	flagSet.Usage = usage
 	flagSet.BoolVar(&flagLiterals, "literals", false, "Obfuscate literals such as strings")
 	flagSet.BoolVar(&flagTiny, "tiny", false, "Optimize for binary size, losing some ability to reverse the process")
+	flagSet.BoolVar(&flagOreans, "oreans", false, "Preserve Oreans Virtualizer macro markers by modifying behavior of -tiny and -literals.")
 	flagSet.BoolVar(&flagDebug, "debug", false, "Print debug logs to stderr")
 	flagSet.StringVar(&flagDebugDir, "debugdir", "", "Write source and obfuscated trees to a directory, e.g. -debugdir=out")
 	flagSet.Var(&flagSeed, "seed", "Provide a base64-encoded seed, e.g. -seed=o9WDTZ4CN4w\nFor a random seed, provide -seed=random")

@@ -37,6 +37,46 @@ import (
 //go:generate go tool bundle -o cmdgo_quoted.go -prefix cmdgoQuoted cmd/internal/quoted
 //go:generate sed -i /go:generate/d cmdgo_quoted.go
 
+func preserveOreansVirtualizerMacroString(s string) bool {
+	switch s {
+	case
+		"Mutate_Start",
+		"Mutate_End",
+		"VirtualizerStrEncryptStart",
+		"VirtualizerStrEncryptEnd",
+		"VirtualizerStrEncryptWStart",
+		"VirtualizerStrEncryptWEnd":
+		return true
+	}
+
+	const customVMPRefix = "CustomVM"
+	var base string
+	switch {
+	case strings.HasSuffix(s, "_Start"):
+		base = strings.TrimSuffix(s, "_Start")
+	case strings.HasSuffix(s, "_End"):
+		base = strings.TrimSuffix(s, "_End")
+	default:
+		return false
+	}
+	if !strings.HasPrefix(base, customVMPRefix) {
+		return false
+	}
+
+	digits := base[len(customVMPRefix):]
+	if len(digits) != 8 {
+		return false
+	}
+
+	for _, r := range digits {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+
+	return true
+}
+
 // computeLinkerVariableStrings iterates over the -ldflags arguments,
 // filling a map with all the string values set via the linker's -X flag.
 // TODO: can we put this in sharedCache, using objectString as a key?
@@ -1216,7 +1256,11 @@ func (tf *transformer) transformGoFile(file *ast.File) *ast.File {
 	// because obfuscated literals sometimes escape to heap,
 	// and that's not allowed in the runtime itself.
 	if flagLiterals && tf.curPkg.ToObfuscate {
-		file = literals.Obfuscate(tf.obfRand, file, tf.info, tf.linkerVariableStrings, randomName)
+		var opts []literals.ObfuscateOption
+		if flagOreans {
+			opts = append(opts, literals.WithKeepString(preserveOreansVirtualizerMacroString))
+		}
+		file = literals.Obfuscate(tf.obfRand, file, tf.info, tf.linkerVariableStrings, randomName, opts)
 
 		// some imported constants might not be needed anymore, remove unnecessary imports
 		tf.useAllImports(file)
