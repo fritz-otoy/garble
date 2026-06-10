@@ -12,8 +12,8 @@ import (
 	mathrand "math/rand"
 	"strings"
 
+	ah "github.com/fritz-otoy/garble/internal/asthelper"
 	"golang.org/x/tools/go/ast/astutil"
-	ah "mvdan.cc/garble/internal/asthelper"
 )
 
 // MinSize is the lower bound limit, of the size of string-like literals

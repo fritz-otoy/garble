@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	ah "mvdan.cc/garble/internal/asthelper"
+	ah "github.com/fritz-otoy/garble/internal/asthelper"
 )
 
 // updateMagicValue updates the global constant

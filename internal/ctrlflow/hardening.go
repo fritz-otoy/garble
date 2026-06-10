@@ -7,9 +7,9 @@ import (
 	mathrand "math/rand"
 	"strconv"
 
+	ah "github.com/fritz-otoy/garble/internal/asthelper"
+	"github.com/fritz-otoy/garble/internal/literals"
 	"golang.org/x/tools/go/ssa"
-	ah "mvdan.cc/garble/internal/asthelper"
-	"mvdan.cc/garble/internal/literals"
 )
 
 var hardeningMap = map[string]dispatcherHardening{

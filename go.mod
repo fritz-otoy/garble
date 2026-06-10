@@ -1,4 +1,4 @@
-module mvdan.cc/garble
+module github.com/fritz-otoy/garble
 
 // Go 1.26.2 fixed a fairly common Windows runtime crash.
 go 1.26.2

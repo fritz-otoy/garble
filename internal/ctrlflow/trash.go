@@ -15,9 +15,9 @@ import (
 	"strconv"
 	"strings"
 
+	ah "github.com/fritz-otoy/garble/internal/asthelper"
+	"github.com/fritz-otoy/garble/internal/ssa2ast"
 	"golang.org/x/tools/go/ssa"
-	ah "mvdan.cc/garble/internal/asthelper"
-	"mvdan.cc/garble/internal/ssa2ast"
 )
 
 const (
